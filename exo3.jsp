@@ -4,16 +4,16 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Recherche de films par année</title>
+    <title>Combined JSP</title>
 </head>
 <body>
-    <h1>Recherche de films par année</h1>
 
+    <!-- Recherche de films par année -->
+    <h1>Recherche de films par année</h1>
     <form method="get" action="">
         Entrez une année : <input type="number" name="annee" placeholder="Entrez une année">
         <input type="submit" value="Rechercher">
     </form>
-
     <div id="resultat">
         <% 
         String anneeRecherchee = request.getParameter("annee");
@@ -59,33 +59,14 @@
         }
         %>
     </div>
-</body>
-</html>
 
-
-
-
-
-
-
-
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="java.sql.*" %>
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Modification du titre d'un film par ID</title>
-</head>
-<body>
+    <!-- Modification du titre d'un film par ID -->
     <h1>Modification du titre d'un film par ID</h1>
-
     <form method="post" action="">
         Entrez l'ID du film : <input type="number" name="idFilm" placeholder="Entrez l'ID du film">
         Nouveau titre : <input type="text" name="nouveauTitre" placeholder="Nouveau titre">
         <input type="submit" value="Modifier">
     </form>
-
     <div id="resultat">
         <% 
         String idFilm = request.getParameter("idFilm");
