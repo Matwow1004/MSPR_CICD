@@ -28,15 +28,14 @@
         conn = DriverManager.getConnection(url, user, password);
 
         String anneeRecherchee = request.getParameter("annee");
-        String sql;
+        String sql = "SELECT idFilm, titre, année FROM Film";
 
         if (anneeRecherchee != null && !anneeRecherchee.isEmpty()) {
-            sql = "SELECT idFilm, titre, année FROM Film WHERE année >= ?";
+            sql += " WHERE année = ?";
             pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, Integer.parseInt(anneeRecherchee));
         } else {
-            sql = "SELECT idFilm, titre, année FROM Film WHERE année >= 2000";
-            pstmt = conn.prepareStatement(sql);
+            out.println("Veuillez entrer une année.");
         }
 
         rs = pstmt.executeQuery();
@@ -61,3 +60,4 @@
     %>
 </body>
 </html>
+
