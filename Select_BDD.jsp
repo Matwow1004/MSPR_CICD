@@ -1,40 +1,42 @@
-<!DOCTYPE html>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.sql.*" %>
+
 <html>
 <head>
-    <title>Recherche de films par année</title>
+    <meta charset="UTF-8">
+    <title>Connexion à MySQL via JSP</title>
 </head>
 <body>
-    <h1>Recherche de films par année</h1>
+    <h1>Exemple de connexion à MySQL via JSP</h1>
+    <% 
+    String url = "jdbc:mariadb://localhost:3306/films";
+    String user = "mysql";
+    String password = "mysql";
 
-    Entrez une année : <input type="text" id="annee">
-    <button onclick="rechercherFilms()">Rechercher</button>
+        // Charger le pilote JDBC
+        Class.forName("org.mariadb.jdbc.Driver");
 
-    <div id="resultat"></div>
+        // Établir la connexion
+Connection conn = DriverManager.getConnection(url, user, password);
+            // Exemple de requête SQL
+        String sql = "SELECT idFilm, titre, année FROM Film WHERE année >= 2000";
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        ResultSet rs = pstmt.executeQuery();
 
-    <script>
-        function rechercherFilms() {
-            var annee = document.getElementById('annee').value;
-            var resultatDiv = document.getElementById('resultat');
-
-            if (annee.trim() !== '') {
-                var xhr = new XMLHttpRequest();
-                xhr.onreadystatechange = function () {
-                    if (xhr.readyState === XMLHttpRequest.DONE) {
-                        if (xhr.status === 200) {
-                            resultatDiv.innerHTML = xhr.responseText;
-                        } else {
-                            resultatDiv.innerHTML = 'Erreur lors de la requête.';
-                        }
-                    }
-                };
-
-                xhr.open('GET', 'traitement.jsp?annee=' + annee, true);
-                xhr.send();
-            } else {
-                resultatDiv.innerHTML = 'Veuillez entrer une année.';
-            }
+        // Afficher les résultats (à adapter selon vos besoins)
+        while (rs.next()) {
+            String colonne1 = rs.getString("idFilm");
+            String colonne2 = rs.getString("titre");
+            String colonne3 = rs.getString("année");
+            // Faites ce que vous voulez avec les données...
+            //Exemple d'affichage de 2 colonnes
+            out.println("id : " + colonne1 + ", titre : " + colonne2 + ", année : " + colonne3 + "</br>");
         }
-    </script>
+
+        // Fermer les ressources 
+        rs.close();
+        pstmt.close();
+        conn.close();
+    %>
 </body>
 </html>
-
