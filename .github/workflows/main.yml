@@ -16,4 +16,4 @@ jobs:
         key: ${{ secrets.EC2_SSH_KEY }}
         port: ${{ secrets.DEPLOY_PORT }}
         source: "LangloisMateo.war"
-        target: "/opt/tomcat/webapps"
+        target: "/opt/tomcat/webapps" 
