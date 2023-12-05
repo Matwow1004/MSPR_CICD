@@ -1,42 +1,63 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*" %>
-
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Connexion à MySQL via JSP</title>
+    <title>Recherche de films par année</title>
 </head>
 <body>
-    <h1>Exemple de connexion à MySQL via JSP</h1>
-    <% 
-    String url = "jdbc:mariadb://localhost:3306/films";
-    String user = "mysql";
-    String password = "mysql";
+    <h1>Recherche de films par année</h1>
 
-        // Charger le pilote JDBC
-        Class.forName("org.mariadb.jdbc.Driver");
+    <form method="get" action="">
+        Entrez une année : <input type="number" name="annee" placeholder="Entrez une année">
+        <input type="submit" value="Rechercher">
+    </form>
 
-        // Établir la connexion
-Connection conn = DriverManager.getConnection(url, user, password);
-            // Exemple de requête SQL
-        String sql = "SELECT idFilm, titre, année FROM Film WHERE année >= 2000";
-        PreparedStatement pstmt = conn.prepareStatement(sql);
-        ResultSet rs = pstmt.executeQuery();
+    <div id="resultat">
+        <% 
+        String anneeRecherchee = request.getParameter("annee");
 
-        // Afficher les résultats (à adapter selon vos besoins)
-        while (rs.next()) {
-            String colonne1 = rs.getString("idFilm");
-            String colonne2 = rs.getString("titre");
-            String colonne3 = rs.getString("année");
-            // Faites ce que vous voulez avec les données...
-            //Exemple d'affichage de 2 colonnes
-            out.println("id : " + colonne1 + ", titre : " + colonne2 + ", année : " + colonne3 + "</br>");
+        if (anneeRecherchee != null && !anneeRecherchee.isEmpty()) {
+            String url = "jdbc:mariadb://localhost:3306/films";
+            String user = "mysql";
+            String password = "mysql";
+
+            Connection conn = null;
+            PreparedStatement pstmt = null;
+            ResultSet rs = null;
+
+            try {
+                Class.forName("org.mariadb.jdbc.Driver");
+                conn = DriverManager.getConnection(url, user, password);
+
+                String sql = "SELECT idFilm, titre, année FROM Film WHERE année = ?";
+                pstmt = conn.prepareStatement(sql);
+                pstmt.setInt(1, Integer.parseInt(anneeRecherchee));
+
+                rs = pstmt.executeQuery();
+
+                while (rs.next()) {
+                    String colonne1 = rs.getString("idFilm");
+                    String colonne2 = rs.getString("titre");
+                    String colonne3 = rs.getString("année");
+                    out.println("id : " + colonne1 + ", titre : " + colonne2 + ", année : " + colonne3 + "<br>");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (rs != null) rs.close();
+                    if (pstmt != null) pstmt.close();
+                    if (conn != null) conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        } else if (request.getParameter("annee") != null) {
+            out.println("Veuillez entrer une année.");
         }
-
-        // Fermer les ressources 
-        rs.close();
-        pstmt.close();
-        conn.close();
-    %>
+        %>
+    </div>
 </body>
 </html>
