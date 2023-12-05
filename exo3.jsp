@@ -9,70 +9,39 @@
 <body>
 
     <!-- Recherche de films par année -->
-    <h1>Recherche de films par année</h1>
-    <form method="get" action="">
-        Entrez une année : <input type="number" name="annee" placeholder="Entrez une année">
-        <input type="submit" value="Rechercher">
-    </form>
-    <div id="resultat">
-        <% 
-        String anneeRecherchee = request.getParameter("annee");
-
-        if (anneeRecherchee != null && !anneeRecherchee.isEmpty()) {
-            String url = "jdbc:mariadb://localhost:3306/films";
-            String user = "mysql";
-            String password = "mysql";
-
-            Connection conn = null;
-            PreparedStatement pstmt = null;
-            ResultSet rs = null;
-
-            try {
-                Class.forName("org.mariadb.jdbc.Driver");
-                conn = DriverManager.getConnection(url, user, password);
-
-                String sql = "SELECT idFilm, titre, année FROM Film WHERE année = ?";
-                pstmt = conn.prepareStatement(sql);
-                pstmt.setInt(1, Integer.parseInt(anneeRecherchee));
-
-                rs = pstmt.executeQuery();
-
-                while (rs.next()) {
-                    String colonne1 = rs.getString("idFilm");
-                    String colonne2 = rs.getString("titre");
-                    String colonne3 = rs.getString("année");
-                    out.println("id : " + colonne1 + ", titre : " + colonne2 + ", année : " + colonne3 + "<br>");
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    if (rs != null) rs.close();
-                    if (pstmt != null) pstmt.close();
-                    if (conn != null) conn.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-        } else if (request.getParameter("annee") != null) {
-            out.println("Veuillez entrer une année.");
-        }
-        %>
-    </div>
+    <!-- ... (Code existant pour la recherche de films par année) ... -->
 
     <!-- Modification du titre d'un film par ID -->
-    <h1>Modification du titre d'un film par ID</h1>
-    <form method="post" action="">
-        Entrez l'ID du film : <input type="number" name="idFilm" placeholder="Entrez l'ID du film">
-        Nouveau titre : <input type="text" name="nouveauTitre" placeholder="Nouveau titre">
-        <input type="submit" value="Modifier">
-    </form>
-    <div id="resultat">
-        <% 
-        String idFilm = request.getParameter("idFilm");
-        String nouveauTitre = request.getParameter("nouveauTitre");
+    <!-- ... (Code existant pour la modification du titre d'un film par ID) ... -->
 
-        if (idFilm != null && nouveauTitre != null && !idFilm.isEmpty() && !nouveauTitre.isEmpty()) {
+    <!-- Ajout d'un nouveau film -->
+    <h1>Ajout d'un nouveau film</h1>
+    <form method="post" action="">
+        ID du film : <input type="number" name="idFilmAjout" placeholder="ID du film"><br>
+        Titre : <input type="text" name="titreAjout" placeholder="Titre du film"><br>
+        Année : <input type="number" name="anneeAjout" placeholder="Année de sortie"><br>
+        Genre : <input type="text" name="genreAjout" placeholder="Genre du film"><br>
+        Résumé : <textarea name="resumeAjout" placeholder="Résumé du film"></textarea><br>
+        ID du réalisateur : <input type="number" name="idRealisateurAjout" placeholder="ID du réalisateur"><br>
+        Code pays : <input type="text" name="codePaysAjout" placeholder="Code pays"><br>
+        <input type="submit" value="Ajouter">
+    </form>
+    
+    <div id="resultatAjout">
+        <% 
+        String idFilmAjout = request.getParameter("idFilmAjout");
+        String titreAjout = request.getParameter("titreAjout");
+        String anneeAjout = request.getParameter("anneeAjout");
+        String genreAjout = request.getParameter("genreAjout");
+        String resumeAjout = request.getParameter("resumeAjout");
+        String idRealisateurAjout = request.getParameter("idRealisateurAjout");
+        String codePaysAjout = request.getParameter("codePaysAjout");
+
+        if (idFilmAjout != null && titreAjout != null && anneeAjout != null && genreAjout != null &&
+            resumeAjout != null && idRealisateurAjout != null && codePaysAjout != null &&
+            !idFilmAjout.isEmpty() && !titreAjout.isEmpty() && !anneeAjout.isEmpty() && !genreAjout.isEmpty() &&
+            !resumeAjout.isEmpty() && !idRealisateurAjout.isEmpty() && !codePaysAjout.isEmpty()) {
+
             String url = "jdbc:mariadb://localhost:3306/films";
             String user = "mysql";
             String password = "mysql";
@@ -84,17 +53,22 @@
                 Class.forName("org.mariadb.jdbc.Driver");
                 conn = DriverManager.getConnection(url, user, password);
 
-                String sql = "UPDATE Film SET titre = ? WHERE idFilm = ?";
+                String sql = "INSERT INTO Film (idFilm, titre, année, genre, résumé, idRéalisateur, codePays) VALUES (?, ?, ?, ?, ?, ?, ?)";
                 pstmt = conn.prepareStatement(sql);
-                pstmt.setString(1, nouveauTitre);
-                pstmt.setInt(2, Integer.parseInt(idFilm));
+                pstmt.setInt(1, Integer.parseInt(idFilmAjout));
+                pstmt.setString(2, titreAjout);
+                pstmt.setInt(3, Integer.parseInt(anneeAjout));
+                pstmt.setString(4, genreAjout);
+                pstmt.setString(5, resumeAjout);
+                pstmt.setInt(6, Integer.parseInt(idRealisateurAjout));
+                pstmt.setString(7, codePaysAjout);
 
                 int rowsAffected = pstmt.executeUpdate();
 
                 if (rowsAffected > 0) {
-                    out.println("Le titre du film avec l'ID " + idFilm + " a été modifié avec succès.");
+                    out.println("Le film a été ajouté avec succès.");
                 } else {
-                    out.println("Aucun film trouvé avec cet ID.");
+                    out.println("Erreur lors de l'ajout du film.");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -106,11 +80,15 @@
                     e.printStackTrace();
                 }
             }
-        } else if (idFilm != null || nouveauTitre != null) {
-            out.println("Veuillez entrer à la fois l'ID du film et le nouveau titre.");
+        } else if (idFilmAjout != null || titreAjout != null || anneeAjout != null || genreAjout != null ||
+                   resumeAjout != null || idRealisateurAjout != null || codePaysAjout != null) {
+            out.println("Veuillez remplir tous les champs pour ajouter un nouveau film.");
         }
         %>
     </div>
+
+    <!-- ... (Autres sections HTML pour les tables Pays, Artiste, Rôle, Internaute, Notation) ... -->
+
 </body>
 </html>
 
