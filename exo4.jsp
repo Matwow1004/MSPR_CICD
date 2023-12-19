@@ -4,16 +4,16 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Manipulation de films</title>
+    <title>Recherche, Modification et Ajout de Films</title>
 </head>
 <body>
+    <h1>Cherche ton film ici</h1>
 
-    <!-- Recherche de films par année -->
-    <h1>Recherche de films par année</h1>
     <form method="get" action="">
         Entrez une année : <input type="number" name="annee" placeholder="Entrez une année">
         <input type="submit" value="Rechercher">
     </form>
+
     <div id="resultat">
         <% 
         String anneeRecherchee = request.getParameter("annee");
@@ -60,109 +60,62 @@
         %>
     </div>
 
-    <!-- Modification du titre d'un film par ID -->
-    <h1>Modification du titre d'un film par ID</h1>
+    <h1>Modification de Titre de Film</h1>
+
     <form method="post" action="">
-        Entrez l'ID du film : <input type="number" name="idFilm" placeholder="Entrez l'ID du film">
-        Nouveau titre : <input type="text" name="nouveauTitre" placeholder="Nouveau titre">
-        <input type="submit" value="Modifier">
+        ID du Film à Modifier: 
+        <input type="text" name="filmId" />
+        Nouveau Titre: 
+        <input type="text" name="nouveauTitre" />
+        <input type="submit" value="Modifier Titre" />
     </form>
-    <div id="resultat">
+
+    <div id="resultatModification">
         <% 
-        String idFilm = request.getParameter("idFilm");
-        String nouveauTitre = request.getParameter("nouveauTitre");
-
-        if (idFilm != null && nouveauTitre != null && !idFilm.isEmpty() && !nouveauTitre.isEmpty()) {
-            String url = "jdbc:mariadb://localhost:3306/films";
-            String user = "mysql";
-            String password = "mysql";
-
-            Connection conn = null;
-            PreparedStatement pstmt = null;
-
-            try {
-                Class.forName("org.mariadb.jdbc.Driver");
-                conn = DriverManager.getConnection(url, user, password);
-
-                String sql = "UPDATE Film SET titre = ? WHERE idFilm = ?";
-                pstmt = conn.prepareStatement(sql);
-                pstmt.setString(1, nouveauTitre);
-                pstmt.setInt(2, Integer.parseInt(idFilm));
-
-                int rowsAffected = pstmt.executeUpdate();
-
-                if (rowsAffected > 0) {
-                    out.println("Le titre du film avec l'ID " + idFilm + " a été modifié avec succès.");
-                } else {
-                    out.println("Aucun film trouvé avec cet ID.");
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    if (pstmt != null) pstmt.close();
-                    if (conn != null) conn.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-        } else if (idFilm != null || nouveauTitre != null) {
-            out.println("Veuillez entrer à la fois l'ID du film et le nouveau titre.");
-        }
+        // Your modification code here
         %>
     </div>
 
-    <!-- Création d'un nouveau film -->
-    <h1>Création d'un nouveau film</h1>
+    <h1>Ajout d'un Nouveau Film</h1>
+
     <form method="post" action="">
-        Titre : <input type="text" name="nouveauTitre" placeholder="Titre du film">
-        Année : <input type="number" name="nouvelleAnnee" placeholder="Année du film">
-        <!-- Ajoutez d'autres champs ici pour d'autres informations sur le film -->
-        <input type="submit" value="Ajouter">
+        Titre du Film: 
+        <input type="text" name="titre" required/><br>
+
+        Année de Sortie: 
+        <input type="text" name="annee" required/><br>
+
+        Genre:
+        <input type="text" name="genre" required/><br>
+
+        Résumé:
+        <textarea name="resume" rows="4" cols="50" required></textarea><br>
+
+        Réalisateur:
+        <input type="text" name="realisateur" required/><br>
+
+        Pays:
+        <input type="text" name="pays" required/><br>
+
+        <input type="submit" value="Ajouter Film" />
     </form>
-    <div id="resultat">
-        <% 
-        String nouveauTitre = request.getParameter("nouveauTitre");
-        String nouvelleAnnee = request.getParameter("nouvelleAnnee");
 
-        if (nouveauTitre != null && nouvelleAnnee != null && !nouveauTitre.isEmpty() && !nouvelleAnnee.isEmpty()) {
-            String url = "jdbc:mariadb://localhost:3306/films";
-            String user = "mysql";
-            String password = "mysql";
+    <div id="resultatAjout">
+        <%  
+        // Your code for adding a new film here
+        if ("POST".equalsIgnoreCase(request.getMethod())) {
+            String titre = request.getParameter("titre");
+            String annee = request.getParameter("annee");
+            String genre = request.getParameter("genre");
+            String resume = request.getParameter("resume");
+            String realisateur = request.getParameter("realisateur");
+            String pays = request.getParameter("pays");
 
-            Connection conn = null;
-            PreparedStatement pstmt = null;
-
-            try {
-                Class.forName("org.mariadb.jdbc.Driver");
-                conn = DriverManager.getConnection(url, user, password);
-
-                String sql = "INSERT INTO Film (titre, année) VALUES (?, ?)";
-                pstmt = conn.prepareStatement(sql);
-                pstmt.setString(1, nouveauTitre);
-                pstmt.setInt(2, Integer.parseInt(nouvelleAnnee));
-
-                int rowsAffected = pstmt.executeUpdate();
-
-                if (rowsAffected > 0) {
-                    out.println("Le film '" + nouveauTitre + "' a été ajouté avec succès.");
-                } else {
-                    out.println("Erreur lors de l'ajout du film.");
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    if (pstmt != null) pstmt.close();
-                    if (conn != null) conn.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-        } else if (nouveauTitre != null || nouvelleAnnee != null) {
-            out.println("Veuillez remplir tous les champs pour ajouter un nouveau film.");
+            // Your code to insert the new film into the database goes here
+            // You can use a PreparedStatement to execute an INSERT query
+            // Make sure to handle exceptions appropriately
         }
         %>
     </div>
 </body>
-</html>
+</html> 
