@@ -1,115 +1,44 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*" %>
-<!DOCTYPE html>
+
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Recherche, Modification et Ajout de Films</title>
+    <title>Connexion à MySQL via JSP</title>
 </head>
 <body>
+    <h1>Exemple de connexion à MySQL via JSP</h1>
+    <% 
+    String url = "jdbc:mariadb://localhost:3306/equipements";
+    String user = "mysql";
+    String password = "mysql";
 
-    <h1>Cherche ton film ici</h1>
+        // Charger le pilote JDBC
+        Class.forName("org.mariadb.jdbc.Driver");
 
-    <form method="get" action="">
-        Entrez une année : <input type="number" name="annee" placeholder="Entrez une année">
-        <input type="submit" value="Rechercher">
-    </form>
+        // Établir la connexion
+Connection conn = DriverManager.getConnection(url, user, password);
+            // Exemple de requête SQL
+        String sql = "SELECT equi_id, equi_libelle, equi_lat, equi_long, get_distance_metres('48.858205', '2.294359', equi_lat, equi_long) AS proximite FROM equipement HAVING proximite < 1000 ORDER BY proximite ASC LIMIT 10;";
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        ResultSet rs = pstmt.executeQuery();
 
-    <div id="resultat">
-        <% 
-        String anneeRecherchee = request.getParameter("annee");
-
-        if (anneeRecherchee != null && !anneeRecherchee.isEmpty()) {
-            String url = "jdbc:mariadb://localhost:3306/films";
-            String user = "mysql";
-            String password = "mysql";
-
-            Connection conn = null;
-            PreparedStatement pstmt = null;
-            ResultSet rs = null;
-
-            try {
-                Class.forName("org.mariadb.jdbc.Driver");
-                conn = DriverManager.getConnection(url, user, password);
-
-                String sql = "SELECT idFilm, titre, année FROM Film WHERE année = ?";
-                pstmt = conn.prepareStatement(sql);
-                pstmt.setInt(1, Integer.parseInt(anneeRecherchee));
-
-                rs = pstmt.executeQuery();
-
-                while (rs.next()) {
-                    String colonne1 = rs.getString("idFilm");
-                    String colonne2 = rs.getString("titre");
-                    String colonne3 = rs.getString("année");
-                    out.println("id : " + colonne1 + ", titre : " + colonne2 + ", année : " + colonne3 + "<br>");
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    if (rs != null) rs.close();
-                    if (pstmt != null) pstmt.close();
-                    if (conn != null) conn.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-        } else if (request.getParameter("annee") != null) {
-            out.println("Veuillez entrer une année.");
+        // Afficher les résultats (à adapter selon vos besoins)
+        while (rs.next()) {
+            String colonne1 = rs.getString("equi_libelle");
+            String colonne2 = rs.getString("equi_lat");
+            String colonne3 = rs.getString("equi_long");
+            // Faites ce que vous voulez avec les données...
+            //Exemple d'affichage de 2 colonnes
+            out.println("Batiment : " + colonne1 + ", latitude : " + colonne2 + ", Longitude : " + colonne3 + "</br>");
         }
-        %>
-    </div>
 
-    <h1>Modification de Titre de Film</h1>
-
-    <form method="post" action="">
-        ID du Film à Modifier: 
-        <input type="text" name="filmId" />
-        Nouveau Titre: 
-        <input type="text" name="nouveauTitre" />
-        <input type="submit" value="Modifier Titre" />
-    </form>
-
-    <div id="resultatModification">
-        <% 
-        // Your modification code here
-        %>
-    </div>
-
-    <h1>Ajout d'un Nouveau Film</h1>
-
-    <form method="post" action="">
-        Titre du Film: 
-        <input type="text" name="titre" required/><br>
-
-        Année de Sortie: 
-        <input type="text" name="annee" required/><br>
-
-        Réalisateur:
-        <input type="text" name="realisateur" required/><br>
-
-        Pays:
-        <input type="text" name="pays" required/><br>
-
-        <input type="submit" value="Ajouter Film" />
-    </form>
-
-    <div id="resultatAjout">
-        <%  
-        // Your code for adding a new film here
-        if ("POST".equalsIgnoreCase(request.getMethod())) {
-            String titre = request.getParameter("titre");
-            String annee = request.getParameter("annee");
-            String realisateur = request.getParameter("realisateur");
-            String pays = request.getParameter("pays");
-
-            // Your code to insert the new film into the database goes here
-            // You can use a PreparedStatement to execute an INSERT query
-            // Make sure to handle exceptions appropriately
-        }
-        %>
-    </div>
-
+        // Fermer les ressources 
+        rs.close();
+        pstmt.close();
+        conn.close();
+    %>
+</body>
+</html>
 </body>
 </html>
